@@ -1,6 +1,13 @@
 package com.taxapi.controller;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import com.taxapi.model.Client;
@@ -23,7 +30,11 @@ public final class ApiController {
     /** The tax API service. */
     private final TaxApiService taxApiService;
 
-
+    /**
+     * Creates an ApiController.
+     *
+     * @param taxApiService the tax API service
+     */
     public ApiController(
         final TaxApiService taxApiService
     ) {
@@ -57,7 +68,14 @@ public final class ApiController {
         return ResponseEntity.ok(createdClient);
     }
 
-
+    /**
+     * Creates an item.
+     *
+     * @param apiKey the API key
+     * @param item the item to create
+     * @return the created item
+     * @throws IOException if an I/O error occurs
+     */
     @PostMapping("/items")
     public ResponseEntity<Item> createItem(
         @RequestHeader("X-API-Key")
@@ -77,7 +95,13 @@ public final class ApiController {
         return ResponseEntity.ok(createdItem);
     }
 
-
+    /**
+     * Gets all items.
+     *
+     * @param apiKey the API key
+     * @return the list of items
+     * @throws IOException if an I/O error occurs
+     */
     @GetMapping("/items")
     public ResponseEntity<List<Item>> getItems(
         @RequestHeader("X-API-Key")
@@ -118,7 +142,14 @@ public final class ApiController {
         return ResponseEntity.ok(item);
     }
 
-
+    /**
+     * Deletes an item by its ID.
+     *
+     * @param apiKey the API key
+     * @param id the item ID
+     * @return a response after deletion
+     * @throws IOException if an I/O error occurs
+     */
     @DeleteMapping("/items/{id}")
     public ResponseEntity<Void> deleteItem(
         @RequestHeader("X-API-Key")
@@ -168,7 +199,13 @@ public final class ApiController {
         return ResponseEntity.ok(response);
     }
 
-
+    /**
+     * Gets supported items.
+     *
+     * @param apiKey the API key
+     * @return the response of supported items
+     * @throws IOException if an I/O error occurs
+     */
     @GetMapping("/supported")
     public ResponseEntity<SupportedResponse>
         getSupported(
