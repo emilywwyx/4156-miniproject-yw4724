@@ -1,0 +1,42 @@
+Bugs Found and Fixed
+
+
+The following bugs were found and fixed during Part 0, unit/integration testing, manual API testing, and PMD static analysis.
+
+
+1. Misspelled constructor in TaxApiApplication.java
+The constructor was named "TaxApiApplicaton()" instead of "TaxApiApplication()". Because the name did not match the class name, Java did not recognize it as a constructor and reported an "invalid method declaration; return type required" compilation error. Fixed by correcting the constructor name.
+
+
+2. Missing semicolon in TaxApiApplication.main()
+"SpringApplication.run(TaxApiApplication.class, args)" was missing a semicolon, which caused a compilation error. Fixed by adding the semicolon.
+
+
+3. Missing semicolon in ApiController.createItem()
+"return ResponseEntity.ok(createdItem)" was missing a semicolon and prevented the project from compiling. Fixed by adding the semicolon.
+
+
+4. Item.java: Item.getId() returned the wrong field
+Item.getId() returned "name" instead of "id", even though its Javadoc says that the method should return the item's ID. As a result, getItemById() and deleteItem() compared the requested ID against the item's name, so lookup and deletion by ID did not work correctly.
+PMD helped identify this issue by reporting that the "id" field was never used. Fixed getId() to return "id".
+
+
+5. TaxApiService.java: Name validation logic in createClient() was wrong (reversed)
+TaxApiService.createClient() checked whether a client name already existed, but returned null when the name did not exist:
+
+if (!nameExists) {
+return null;
+}
+
+This caused new client names to fail while duplicate names were allowed. It also conflicted with the controller behavior, which returns HTTP 409 when createClient() returns null.
+The bug was found through unit testing and manual endpoint testing. Fixed by changing the condition to:
+
+if (nameExists) {
+return null;
+}
+
+
+6. TaxApiService.java: calculateTax() could throw a NullPointerException for missing input
+When no itemId was provided, calculateTax() used request.getPrice() and request.getCategory() directly. Since getPrice() returns a nullable Double, a request with neither an itemId nor a price caused a null value to be unboxed into a primitive double, resulting in an unhandled NullPointerException and HTTP 500 response.
+The bug was found by manually testing the /v1/tax/quote endpoint with missing required fields. Fixed by validating price and category before using them and returning null for invalid input, which the controller converts into a 400 response.
+PMD was useful for finding static issues such as the unused "id" field, while unit/integration tests and manual API testing were used to find behavior and logic bugs that static analysis could not detect.

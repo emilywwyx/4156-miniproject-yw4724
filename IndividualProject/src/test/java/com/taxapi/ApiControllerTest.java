@@ -73,7 +73,7 @@ class ApiControllerTest {
     @Test
     void getItemByIdReturnsOkWhenFound() throws Exception {
         mockMvc.perform(
-                get("/v1/items/Laptop")
+                get("/v1/items/item-1")
                     .header("X-API-Key", VALID_KEY)
             )
             .andExpect(status().isOk());
@@ -91,7 +91,7 @@ class ApiControllerTest {
     @Test
     void getItemByIdReturnsUnauthorizedWithBadKey() throws Exception {
         mockMvc.perform(
-                get("/v1/items/Laptop")
+                get("/v1/items/item-1")
                     .header("X-API-Key", "wrong-key")
             )
             .andExpect(status().isUnauthorized());
@@ -100,7 +100,7 @@ class ApiControllerTest {
     @Test
     void deleteItemReturnsNoContentWhenFound() throws Exception {
         mockMvc.perform(
-                delete("/v1/items/Laptop")
+                delete("/v1/items/item-1")
                     .header("X-API-Key", VALID_KEY)
             )
             .andExpect(status().isNoContent());
@@ -118,7 +118,7 @@ class ApiControllerTest {
     @Test
     void deleteItemReturnsUnauthorizedWithBadKey() throws Exception {
         mockMvc.perform(
-                delete("/v1/items/Laptop")
+                delete("/v1/items/item-1")
                     .header("X-API-Key", "wrong-key")
             )
             .andExpect(status().isUnauthorized());

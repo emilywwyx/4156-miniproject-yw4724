@@ -93,7 +93,7 @@ public final class TaxApiService {
             .anyMatch(c ->
                 c.getName().equalsIgnoreCase(name)
             );
-        if (!nameExists) {
+        if (nameExists) {
             return null;
         }
 
@@ -249,6 +249,9 @@ public final class TaxApiService {
             price = item.getBasePrice();
             category = item.getCategory();
         } else {
+            if (request.getPrice() == null || request.getCategory() == null) {
+                return null;
+            }
             price = request.getPrice();
             category = request.getCategory();
         }
