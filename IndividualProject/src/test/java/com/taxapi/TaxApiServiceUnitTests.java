@@ -1,6 +1,8 @@
 package com.taxapi;
 
 import com.taxapi.service.TaxApiService;
+import com.taxapi.model.TaxQuoteRequest;
+import com.taxapi.model.TaxQuoteResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -10,6 +12,12 @@ import org.springframework.context.annotation.Import;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @Import(TestConfig.class)
@@ -41,7 +49,92 @@ class TaxApiServiceUnitTests {
     // The `service` field above is the autowired bean under test.
 
     @Test
-    void contextLoads() {
-        // Placeholder so the test class is non-empty. Replace with real tests.
+    void validateApiKeyReturnFalseWhenNull() throws Exception {
+        assertFalse(service.validateApiKey(null));
+    }
+
+    @Test
+    void validateApiKeyReturnsTrueWhenKnown() throws Exception {
+        assertTrue(service.validateApiKey("valid-key"));
+    }
+
+    @Test
+    void validateApiKeyReturnsFalseWhenUnknown() throws Exception {
+        assertFalse(service.validateApiKey("wrong-key"));
+    }
+
+    @Test
+    void getItemByIdReturnsItemWhenFund() throws Exception {
+        var item = service.getItemById("Laptop");
+
+        assertEquals("Laptop", item.getName());
+    }
+
+    @Test
+    void getItemByIdReturnsNullWhenMissing() throws Exception {
+        var item = service.getItemById("does-not-exist");
+
+        assertNull(item);
+    }
+
+    @Test
+    void deleteItemReturnsTrueWhenRemoved() throws Exception {
+        boolean deleted = service.deleteItem("Laptop");
+
+        assertTrue(deleted);
+    }
+
+    @Test
+    void deleteItemReturnsFalseWhenMissing() throws Exception {
+        boolean deleted = service.deleteItem("does-not-exist");
+
+        assertFalse(deleted);
+    }
+
+    @Test
+    void calculateTaxReturnsQuoteWhenRatFound() throws Exception {
+        TaxQuoteRequest request = new TaxQuoteRequest();
+        request.setState("CA");
+        request.setCategory("electronics");
+        request.setPrice(100.0);
+
+        TaxQuoteResponse response = service.calculateTax(request);
+
+        assertNotNull(response);
+        assertEquals(0.0725, response.getTaxRate());
+    }
+
+    @Test
+    void calculateTaxReturnsNullWhenRateNotFound() throws Exception {
+        TaxQuoteRequest request = new TaxQuoteRequest();
+        request.setState("TX");
+        request.setCategory("electronics");
+        request.setPrice(100.0);
+
+        TaxQuoteResponse response = service.calculateTax(request);
+
+        assertNull(response);
+    }
+
+    @Test
+    void calculateTaxReturnsNullWhenItemIdNotFound() throws Exception {
+        TaxQuoteRequest request = new TaxQuoteRequest();
+        request.setState("CA");
+        request.setItemId("item-1");
+
+        TaxQuoteResponse response = service.calculateTax(request);
+
+        assertNull(response);
+    }
+
+    @Test
+    void calculateTaxReturnsQuoteWhenItemIdFound() throws Exception {
+        TaxQuoteRequest request = new TaxQuoteRequest();
+        request.setState("CA");
+        request.setItemId("Laptop");
+
+        TaxQuoteResponse response = service.calculateTax(request);
+
+        assertNotNull(response);
     }
 }

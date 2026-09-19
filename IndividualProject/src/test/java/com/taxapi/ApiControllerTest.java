@@ -13,6 +13,10 @@ import org.springframework.web.context.WebApplicationContext;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+
 @SpringBootTest
 @Import(TestConfig.class)
 class ApiControllerTest {
@@ -49,7 +53,92 @@ class ApiControllerTest {
     // via mockMvc.perform(...). Aim for >= 55% JaCoCo coverage overall.
 
     @Test
-    void contextLoads() {
-        // Placeholder so the test class is non-empty. Replace with real tests.
+    void getItemsWithValidApiKeyReturnsOk() throws Exception {
+        mockMvc.perform(
+                get("/v1/items")
+                    .header("X-API-Key", VALID_KEY)
+            )
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    void getItemsWithInvalidApiKeyReturnsUnauthorized() throws Exception {
+        mockMvc.perform(
+                get("/v1/items")
+                    .header("X-API-Key", "wrong-key")
+            )
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void getItemByIdReturnsOkWhenFound() throws Exception {
+        mockMvc.perform(
+                get("/v1/items/Laptop")
+                    .header("X-API-Key", VALID_KEY)
+            )
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    void getItemByIdReturnsNotFoundWhenMissing() throws Exception {
+        mockMvc.perform(
+                get("/v1/items/does-not-exist")
+                    .header("X-API-Key", VALID_KEY)
+            )
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getItemByIdReturnsUnauthorizedWithBadKey() throws Exception {
+        mockMvc.perform(
+                get("/v1/items/Laptop")
+                    .header("X-API-Key", "wrong-key")
+            )
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void deleteItemReturnsNoContentWhenFound() throws Exception {
+        mockMvc.perform(
+                delete("/v1/items/Laptop")
+                    .header("X-API-Key", VALID_KEY)
+            )
+            .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deleteItemReturnsNotFoundWhenMissing() throws Exception {
+        mockMvc.perform(
+                delete("/v1/items/does-not-exist")
+                    .header("X-API-Key", VALID_KEY)
+            )
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteItemReturnsUnauthorizedWithBadKey() throws Exception {
+        mockMvc.perform(
+                delete("/v1/items/Laptop")
+                    .header("X-API-Key", "wrong-key")
+            )
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void getSupportedReturnsOkWithValidKey() throws Exception {
+        mockMvc.perform(
+                get("/v1/supported")
+                    .header("X-API-Key", VALID_KEY)
+            )
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    void getSupportedReturnsUnauthorizedWithBadKey() throws Exception {
+        mockMvc.perform(
+                get("/v1/supported")
+                    .header("X-API-Key", "wrong-key")
+            )
+            .andExpect(status().isUnauthorized());
     }
 }
