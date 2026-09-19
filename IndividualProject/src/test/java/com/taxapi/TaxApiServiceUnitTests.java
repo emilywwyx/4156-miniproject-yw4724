@@ -65,7 +65,7 @@ class TaxApiServiceUnitTests {
 
     @Test
     void getItemByIdReturnsItemWhenFund() throws Exception {
-        var item = service.getItemById("Laptop");
+        var item = service.getItemById("item-1");
 
         assertEquals("Laptop", item.getName());
     }
@@ -79,7 +79,7 @@ class TaxApiServiceUnitTests {
 
     @Test
     void deleteItemReturnsTrueWhenRemoved() throws Exception {
-        boolean deleted = service.deleteItem("Laptop");
+        boolean deleted = service.deleteItem("item-1");
 
         assertTrue(deleted);
     }
@@ -120,7 +120,7 @@ class TaxApiServiceUnitTests {
     void calculateTaxReturnsNullWhenItemIdNotFound() throws Exception {
         TaxQuoteRequest request = new TaxQuoteRequest();
         request.setState("CA");
-        request.setItemId("item-1");
+        request.setItemId("no-such-item");
 
         TaxQuoteResponse response = service.calculateTax(request);
 
@@ -131,7 +131,7 @@ class TaxApiServiceUnitTests {
     void calculateTaxReturnsQuoteWhenItemIdFound() throws Exception {
         TaxQuoteRequest request = new TaxQuoteRequest();
         request.setState("CA");
-        request.setItemId("Laptop");
+        request.setItemId("item-1");
 
         TaxQuoteResponse response = service.calculateTax(request);
 
